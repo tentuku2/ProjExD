@@ -2,7 +2,6 @@ import imp
 
 
 import random
-
 def shutudai(qnum):
     list_quiz = ["サザエの旦那の名前は？","カツオの妹の名前は？ ","タラオはカツオから見てどんな関係？"]
     print("問題:" + list_quiz[qnum])
@@ -19,4 +18,3 @@ if __name__ == "__main__":
     qnum = random.randint(0,2)
     shutudai(qnum)
     kaito(qnum)
-    
