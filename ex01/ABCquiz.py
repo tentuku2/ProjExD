@@ -39,14 +39,12 @@ def kaitou(cut_list,count):
         if set(ans_lis) == set(cut_list):
             print("正解だ！おめでとう")
             return 1
-
         else:
             print(f"間違っているぞ！後{rimit-count-1}回だ！最初からやり直せ！")
             shutudai(count+1)
     else:
-        print(f"間違っているぞ！あと後{rimit-count-1}回だ！最初からやり直せ！")
+        print(f"間違っているぞ！後{rimit-count-1}回だ！最初からやり直せ！")
         shutudai(count+1)
-    
 
 
 
