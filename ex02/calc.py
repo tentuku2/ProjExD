@@ -37,6 +37,10 @@ class Main_GUI(tk.Frame):
             self.textbox.delete(0,tk.END)
         elif event.widget["text"] == "⇐×":
             self.textbox.delete(len(self.ans)-1,tk.END)
+        elif event.widget["text"] == ".":
+            self.textbox.delete(0,tk.END)
+            self.ans = float(self.ans)/10
+            self.textbox.insert(tk.END,self.ans)
         elif event.widget["text"] == "=":
             self.textbox.delete(0,tk.END)
             for be,af in zip(befor_list,after_list):
