@@ -9,6 +9,7 @@ from tkinter import Button, ttk as ttk
 import random
 import tkinter.messagebox as tkm
 import maze_maker as m_maker
+import datetime
 
 class Main_GUI(tk.Frame):
     def __init__(self,master):
@@ -46,6 +47,8 @@ class Main_GUI(tk.Frame):
         self.maze_canvas.create_image(150,150,image=self.start,tag="start")
         self.maze_canvas.create_image(self.gx*100+50,self.gy*100+50,image=self.gool,tag="gool")
         self.maze_canvas.create_image(self.mx*100+50,self.my*100+50,image=self.tori,tag="tori")
+        #時間計測開始
+        self.st = datetime.datetime.now()
 
     def count_up(self):
         self.tmr += 1
@@ -84,7 +87,10 @@ class Main_GUI(tk.Frame):
         self.main_proc()
 
     def messeg(self):
-        ret = tkm.askyesno('ナイストライ！', 'もう一回遊ぶドン？')
+        #終了時間獲得
+        self.et = datetime.datetime.now()
+        #メッセージボックス
+        ret = tkm.askyesno('ナイストライ！', f'クリアタイムは{(self.et-self.st).seconds}秒だったドン！\nもう一回遊ぶドン？')
         if ret == False:
             self.quit()
 
