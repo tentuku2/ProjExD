@@ -9,25 +9,27 @@ import tkinter.messagebox as tkm
 class Main_GUI(tk.Frame):
     def __init__(self,master):
         super(Main_GUI,self).__init__()
-        self.maze_canvas = tk.Canvas(self,width=1200,height=600,bg =("#000000"))
+        self.maze_canvas = tk.Canvas(self,width=1500,height=900,bg =("#000000"))
         self.maze_canvas.pack()
         self.tmr = 0
-        self.bind_all("<KeyPress>",self.key_click)
+        self.bind_all("<KeyPress>",self.key_down)
+        self.bind_all("<KeyRelease>",self.key_up)
         self.tori = tk.PhotoImage(file="fig/5.png")
         self.cx = 300
         self.cy = 400
         self.maze_canvas.create_image(self.cx,self.cy,image=self.tori,tag="tori")
+
     
     def count_up(self):
         self.tmr += 1
         self.label["text"] =  self.tmr
         self.after(1000,self.count_up)
     
-    def key_click(self,event):
-        print("a")
-        key = event.keysym
-        tkm.showinfo("a",f"{key}が押されました")
-        self.after(1000,self.count_up)
+    def key_down(self,event):
+        self.key = event.keysym
+ 
+    def key_up(self):
+        self.key = ""
 
 
 
