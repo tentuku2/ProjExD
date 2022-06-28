@@ -1,12 +1,5 @@
-from asyncio import events
-from cProfile import label
-from distutils.file_util import move_file
-from email import message
-from email.mime import image
-import mailcap
 import tkinter as tk
 from tkinter import Button, ttk as ttk
-import random
 import tkinter.messagebox as tkm
 import maze_maker as m_maker
 import datetime
@@ -51,6 +44,7 @@ class Main_GUI(tk.Frame):
         self.st = datetime.datetime.now()
 
     def key_down(self,event):#キー入力字関数
+        #関数イベント変数
         self.key = event.keysym
         if self.key ==  "Up":
             self.cy -= 1
@@ -62,6 +56,7 @@ class Main_GUI(tk.Frame):
             self.cx += 1
         else:
             pass
+        #壁があるかの判定
         if self.maze_lst[self.cy][self.cx] == 0:
             self.mx = self.cx
             self.my = self.cy
@@ -73,10 +68,14 @@ class Main_GUI(tk.Frame):
 
     def key_up(self,event):#キー入力終了字関数
         self.key = ""
+        #ゴールについたかの判断
         if self.gx == self.mx  and  self.gy == self.my:
             self.mx,self.my,self.cx,self.cy = 1,1,1,1
+            #こうかとんの削除
             self.maze_canvas.delete("tori")
+            #メッセージボックスの表示
             self.messeg()
+            #描画関数の表示
             self.maze_fill()
         self.maze_canvas.coords("tori",self.mx*100+50,self.my*100+50)
         self.main_proc()
