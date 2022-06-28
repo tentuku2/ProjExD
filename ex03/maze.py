@@ -36,10 +36,10 @@ class Main_GUI(tk.Frame):
         self.maze_fill()
         self.main_proc()
 
-    def main_proc(self):
+    def main_proc(self): #メインループ関数
         self.after(100,self.main_proc)
     
-    def maze_fill(self):
+    def maze_fill(self): #描画関数
         #外部関数呼び出し
         self.maze_lst = m_maker.make_maze(15,9)
         m_maker.show_maze(self.maze_canvas, self.maze_lst)
@@ -50,12 +50,7 @@ class Main_GUI(tk.Frame):
         #時間計測開始
         self.st = datetime.datetime.now()
 
-    def count_up(self):
-        self.tmr += 1
-        self.label["text"] =  self.tmr
-        self.after(1000,self.count_up)
-    
-    def key_down(self,event):
+    def key_down(self,event):#キー入力字関数
         self.key = event.keysym
         if self.key ==  "Up":
             self.cy -= 1
@@ -76,7 +71,7 @@ class Main_GUI(tk.Frame):
 
         self.main_proc()
 
-    def key_up(self,event):
+    def key_up(self,event):#キー入力終了字関数
         self.key = ""
         if self.gx == self.mx  and  self.gy == self.my:
             self.mx,self.my,self.cx,self.cy = 1,1,1,1
@@ -86,7 +81,7 @@ class Main_GUI(tk.Frame):
         self.maze_canvas.coords("tori",self.mx*100+50,self.my*100+50)
         self.main_proc()
 
-    def messeg(self):
+    def messeg(self): #メッセージボックス関数
         #終了時間獲得
         self.et = datetime.datetime.now()
         #メッセージボックス
