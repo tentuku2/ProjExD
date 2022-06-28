@@ -1,6 +1,7 @@
 from asyncio import events
 from cProfile import label
 from distutils.file_util import move_file
+from email import message
 from email.mime import image
 import mailcap
 import tkinter as tk
@@ -19,24 +20,32 @@ class Main_GUI(tk.Frame):
         self.bind_all("<KeyPress>",self.key_down)
         self.bind_all("<KeyRelease>",self.key_up)
         #使う画像ども
-        self.tori = tk.PhotoImage(file="fig/5.png")
-        self.start = tk.PhotoImage(file="fig/S.png")
-        self.gool = tk.PhotoImage(file="fig/G.png")
+        self.tori = tk.PhotoImage(file="ex03/fig/5.png")
+        self.start = tk.PhotoImage(file="ex03/fig/S.png")
+        self.gool = tk.PhotoImage(file="ex03/fig/G.png")
+        #比較用座標
         self.cx = 1
         self.cy = 1
+        #鳥座標
         self.mx = 1
         self.my = 1
-        self.maze_lst = m_maker.make_maze(15,9)
-        m_maker.show_maze(self.maze_canvas, self.maze_lst)
-        self.maze_canvas.create_rectangle(50,50,50,50,fill="#ff00ff")
-        self.maze_canvas.create_image(150,150,image=self.start,tag="start")
-        self.maze_canvas.create_image(1350,750,image=self.gool,tag="gool")
-
-        self.maze_canvas.create_image(self.mx*100+50,self.my*100+50,image=self.tori,tag="tori")
+        #gole座標
+        self.gx = 13
+        self.gy = 7
+        self.maze_fill()
         self.main_proc()
 
     def main_proc(self):
         self.after(100,self.main_proc)
+    
+    def maze_fill(self):
+        #外部関数呼び出し
+        self.maze_lst = m_maker.make_maze(15,9)
+        m_maker.show_maze(self.maze_canvas, self.maze_lst)
+        #描画
+        self.maze_canvas.create_image(150,150,image=self.start,tag="start")
+        self.maze_canvas.create_image(self.gx*100+50,self.gy*100+50,image=self.gool,tag="gool")
+        self.maze_canvas.create_image(self.mx*100+50,self.my*100+50,image=self.tori,tag="tori")
 
     def count_up(self):
         self.tmr += 1
@@ -66,8 +75,18 @@ class Main_GUI(tk.Frame):
 
     def key_up(self,event):
         self.key = ""
+        if self.gx == self.mx  and  self.gy == self.my:
+            self.mx,self.my,self.cx,self.cy = 1,1,1,1
+            self.maze_canvas.delete("tori")
+            self.messeg()
+            self.maze_fill()
         self.maze_canvas.coords("tori",self.mx*100+50,self.my*100+50)
         self.main_proc()
+
+    def messeg(self):
+        ret = tkm.askyesno('ナイストライ！', 'もう一回遊ぶドン？')
+        if ret == False:
+            self.quit()
 
 if __name__ == "__main__":
     root = tk.Tk()
