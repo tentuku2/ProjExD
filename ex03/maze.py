@@ -28,7 +28,6 @@ class Main_GUI(tk.Frame):
         self.my = 1
         self.maze_lst = m_maker.make_maze(15,9)
         m_maker.show_maze(self.maze_canvas, self.maze_lst)
-        #print(maze_lst)
         self.maze_canvas.create_rectangle(50,50,50,50,fill="#ff00ff")
         self.maze_canvas.create_image(150,150,image=self.start,tag="start")
         self.maze_canvas.create_image(1350,750,image=self.gool,tag="gool")
