@@ -1,6 +1,4 @@
-from doctest import FAIL_FAST
 import datetime
-from linecache import checkcache
 import tkinter
 from pygame.locals import *
 import random
