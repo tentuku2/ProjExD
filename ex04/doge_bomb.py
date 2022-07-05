@@ -1,8 +1,12 @@
+from doctest import FAIL_FAST
+import datetime
 from linecache import checkcache
+import tkinter
 from pygame.locals import *
 import random
 import pygame as pg
 import sys
+import tkinter.messagebox as tkm
 
 class game:
 
@@ -82,11 +86,31 @@ class game:
         self.kkimg_sfc = pg.image.load("fig/koukaton_future.png")
         self.kkimg_sfc = pg.transform.rotozoom(self.kkimg_sfc,0,2.0)
         self.kkimg_rct = self.kkimg_sfc.get_rect()
-        sys.exit
+        self.screen_sfc.blit(self.kkimg_sfc,self.kkimg_rct)
+        a = self.alarm()
+        pg.display.update(self.bg_rect)
+        ret = tkm.askyesno('ナイストライ！', "こんがり焼けました!\nもう一度遊びますか？")
+        if ret == False:
+            sys.exit()
+        else:
+            self.flag = 0
+            self.setup()
     
-    def end():
-        sys.exit
-        
+    def alarm(self):
+        pg.mixer.init(frequency = 44100)    # 初期設定
+        pg.mixer.music.load("fig/sample.wav")     # 音楽ファイルの読み込み
+        pg.mixer.music.play(1)              # 音楽の再生回数(1回)
+        t = datetime.datetime.now()
+        while(1):
+            t2 = datetime.datetime.now()
+            if(t2-t).seconds == 3:
+                return 0
+    
+        pg.mixer.music.stop()               # 再生の終了
+        return 0
+
+    def end(self):
+        sys.exit()
 
 if __name__ == "__main__":
     pg.init()
