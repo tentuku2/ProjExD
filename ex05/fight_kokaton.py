@@ -1,15 +1,8 @@
-import datetime
-from enum import Flag
-from msilib.schema import Class
-from queue import LifoQueue
-from shutil import move
-import tkinter
-from winreg import HKEY_CURRENT_CONFIG
 from pygame.locals import *
 import random
 import pygame as pg
 import sys
-import tkinter.messagebox as tkm
+
 
 class Screen:
     def __init__(self,title,size,irast):
@@ -21,6 +14,7 @@ class Screen:
     
     def blit(self):
         self.suface_sfc.blit(self.bgi_sfc, self.bgi_rct)
+
 
 class Bird:
     key_delta = {pg.K_UP:[0,-1],pg.K_DOWN:[0,1],pg.K_RIGHT:[1,0],pg.K_LEFT:[-1,0]}
@@ -95,9 +89,11 @@ def check_bound(rct, scr_rct):
     if rct.top  < scr_rct.top  or scr_rct.bottom < rct.bottom: tate = -1 # 領域外
     return yoko, tate
 
+
 class Hntur:
+    #コウカトンが倒す対象のハンターを追加する
     def __init__(self,image,size,vxy,scr: Screen):
-        self.life = 3
+        self.life = 3 #ハンターのライフ
         self.hum_sfc = pg.image.load(image)
         self.hum_sfc = pg.transform.rotozoom(self.hum_sfc,0,size)
         self.hum_rct = self.hum_sfc.get_rect()
@@ -118,7 +114,7 @@ class Hntur:
         self.vy *= tate
         self.text = self.font.render("BOSS"+"◇" * self.life  , True, (0,0,0))
         self.blit(scr)
-
+    #コウカトンのあたり判定
     def hit(self,scr:Screen):
         self.life -= 1 
         self.hum_rct.centerx = random.randint(0, scr.suface_rct.width)
@@ -155,7 +151,6 @@ def main():
 
         pg.display.update()
         clock.tick(1000)
-
 
 
 if __name__ == "__main__":
