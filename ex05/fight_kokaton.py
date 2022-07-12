@@ -1,15 +1,15 @@
 import datetime
 from enum import Flag
+from msilib.schema import Class
+from queue import LifoQueue
 from shutil import move
 import tkinter
+from winreg import HKEY_CURRENT_CONFIG
 from pygame.locals import *
 import random
 import pygame as pg
 import sys
 import tkinter.messagebox as tkm
-
-BIRD_POSI = [0,0]
-
 
 class Screen:
     def __init__(self,title,size,irast):
@@ -22,29 +22,15 @@ class Screen:
     def blit(self):
         self.suface_sfc.blit(self.bgi_sfc, self.bgi_rct)
 
-    def bird_chake_bound(self,move_key):
-        if move_key[0] == 0:
-            if self.suface_rct.height > BIRD_POSI[0]+move_key[1] > 0:
-                return True
-            else:
-                return False
-        elif move_key[1] == 1:
-            if self.suface_rct.width > BIRD_POSI[1]+move_key[1] > 0 :
-                return True
-            else:
-                return False
-
 class Bird:
     key_delta = {pg.K_UP:[0,-1],pg.K_DOWN:[0,1],pg.K_RIGHT:[1,0],pg.K_LEFT:[-1,0]}
 
     def __init__(self,image,size,pos):
         pos = list(pos)
-        BIRD_POSI[0] =  pos[0]
-        BIRD_POSI[1] =  pos[1]
         self.kkimg_sfc = pg.image.load(image)
-        self.kkimg_sfc = pg.transform.rotozoom(self.kkimg_sfc,0,2.0)
+        self.kkimg_sfc = pg.transform.rotozoom(self.kkimg_sfc,0,size)
         self.kkimg_rct = self.kkimg_sfc.get_rect()
-        self.kkimg_rct.center = BIRD_POSI[0],BIRD_POSI[1]
+        self.kkimg_rct.center = pos
 
     def update(self,scr:Screen):
         self.key_states = pg.key.get_pressed()
@@ -73,6 +59,7 @@ class Bird:
 
 class Bomb:
     def __init__(self, color, size, vxy, scr: Screen):
+        self.life = 3
         self.sfc = pg.Surface((2*size, 2*size)) # Surface
         self.sfc.set_colorkey((0, 0, 0)) 
         pg.draw.circle(self.sfc, color, (size, size), size)
@@ -88,8 +75,19 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         yoko, tate = check_bound(self.rct, scr.suface_rct)
         self.vx *= yoko
-        self.vy *= tate   
+        self.vy *= tate
+        
         self.blit(scr)
+"""
+    def bom2(self,color,size,vxy,scr:Screen):
+        self.bom2_sfc = pg.Surface((2*size, 2*size)) # Surface
+        self.bom2_sfc.set_colorkey((0, 0, 0)) 
+        pg.draw.circle(self.sfc, color, (size, size), size)
+        self.bom2_rct = self.bom2_sfc.get_rect() # Rect
+        self.bom2_rct.centerx = random.randint(0, scr.suface_rct.width)
+        self.bom2_rct.centery = random.randint(0, scr.suface_rct.height)
+        self.bom2_vx, self.bom2_vy = vxy 
+        """
 
 def check_bound(rct, scr_rct):
     yoko, tate = +1, +1 # 領域内
@@ -97,14 +95,47 @@ def check_bound(rct, scr_rct):
     if rct.top  < scr_rct.top  or scr_rct.bottom < rct.bottom: tate = -1 # 領域外
     return yoko, tate
 
+class Hntur:
+    def __init__(self,image,size,vxy,scr: Screen):
+        self.life = 3
+        self.hum_sfc = pg.image.load(image)
+        self.hum_sfc = pg.transform.rotozoom(self.hum_sfc,0,size)
+        self.hum_rct = self.hum_sfc.get_rect()
+        self.hum_rct.centerx = random.randint(0, scr.suface_rct.width)
+        self.hum_rct.centery = random.randint(0, scr.suface_rct.height)
+        self.vx, self.vy = vxy
+        self.font = pg.font.Font(None, 100)
+           # 描画する文字列の設定
+        
+    def blit(self, scr: Screen):
+        scr.suface_sfc.blit(self.hum_sfc, self.hum_rct)
+        scr.suface_sfc.blit(self.text, [20, 20])
+
+    def update(self, scr: Screen):
+        self.hum_rct.move_ip(self.vx, self.vy)
+        yoko, tate = check_bound(self.hum_rct, scr.suface_rct)
+        self.vx *= yoko
+        self.vy *= tate
+        self.text = self.font.render("BOSS"+"◇" * self.life  , True, (0,0,0))
+        self.blit(scr)
+
+    def hit(self,scr:Screen):
+        self.life -= 1 
+        self.hum_rct.centerx = random.randint(0, scr.suface_rct.width)
+        self.hum_rct.centery = random.randint(0, scr.suface_rct.height)
+        if self.life == 0:
+            self.text = self.font.render("STAGE CREAR", True, (0,0,0))
+            scr.suface_sfc.blit(self.text, [20, 20])
+            return True
 
 
 def main():
+    global LIFE
     clock = pg.time.Clock()
     scr = Screen("逃げろ！こうかとん", (1600, 900), "fig/pg_bg.jpg")
     kkt = Bird("fig/6.png", 2.0, (900, 400))
     bkd = Bomb((255,0,0), 10, (+1,+1), scr)
-
+    hum = Hntur("fig/ryoushi.png",0.3,(+2,+2),scr)
     while True:
         scr.blit()
 
@@ -114,8 +145,13 @@ def main():
 
         kkt.update(scr)
         bkd.update(scr)
+        hum.update(scr)
         if kkt.kkimg_rct.colliderect(bkd.rct):
             return
+        if kkt.kkimg_rct.colliderect(hum.hum_rct):
+            zy = hum.hit(scr)
+            if zy == True:
+                return
 
         pg.display.update()
         clock.tick(1000)
