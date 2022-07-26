@@ -3,6 +3,7 @@ import sys
 import random
 import datetime
 
+#基礎ディスプレイ描画クラス
 class Display:
     #基本ディスプレイの描画
     def __init__(self, title, wh, col):
@@ -16,7 +17,7 @@ class Display:
     def blit(self):
         self.sfc.blit(self.bgi_sfc, self.bgi_rct)
 
-
+#岩盤関連処理クラス
 class Ganban:
     #岩盤関連の全て
     def __init__(self):
@@ -27,7 +28,7 @@ class Ganban:
         self.kiban_size = pg.Rect(20,20,1000,800)
         self.color_list = [[255,255,255],[220,105,30],[160,82,45],[139,69,19]] #岩盤要カラーリスト
         self.rock = [[random.randint(1,3) for i in range(self.gx_size)] for j in range(self.gy_size)] #岩盤本体の2重配列
-        self.kiban_sfc = pg.Surface((self.gx_size*4,self.gy_size*4)) 
+        self.kiban_sfc = pg.Surface((self.gx_size*4,self.gy_size*4))
         self.kiban_sfc.set_colorkey([255,255,255]) #描画しないカラーキー
         self.kiban_sfc.set_alpha(255) #岩盤の透明度
         self.kiban_rct = self.kiban_sfc.get_rect()
@@ -69,13 +70,13 @@ class Ganban:
             self.dig_impct = 8
 
         elif size == "small":
-            self.dig_size = 15
-            self.dig_impct = 2
+            self.dig_size = 20
+            self.dig_impct = 3
 
     def bilt(self,dis:Display):
         dis.sfc.blit(self.kiban_sfc,(20,20,1000,800),self.kiban_rct)
 
-
+#配置オブジェクトクラス
 class Object:
     def __init__(self,dis:Display):
         self.big_btn = pg.Rect(1100,50,200,100)#ハンマーボタン
@@ -111,9 +112,6 @@ class Object:
             for x in self.yakitori_body_x:
                 self.yakitori_body_lis.append((y,x)) #コウカトンの範囲リストの作成
                 self.yakitori_body += gbn.rock[y][x] #コウカトンの地面への埋まり度の作成
-        #for i in self.yakitori_body_lis:
-        #    print(i)
-        #    pg.draw.rect(gbn.kiban_sfc,(255,0,255),((4*i[1])-tori_x//2,(4*i[0])-tori_y//2,4,4)) #掘削結果の描画
 
 #C0A21048 担当haikei関数
     def haikei(self,image,size):#岩盤背景描画
@@ -147,7 +145,7 @@ class Object:
         dis.sfc.blit(self.doriru_img_sfc,self.doriru_img_rct)
         dis.sfc.blit(self.hanma_img_sfc,self.hanma_img_rct)
 
-#　C0A21048 スタート関数制作
+#ゲーム開始時クラス
 class Start:
     #スタート画面描画用関数
     def __init__(self,image,dis:Display):
@@ -161,6 +159,7 @@ class Start:
             dis.sfc.blit(self.start_img_sfc,self.start_img_rct)
             pg.display.update()
 
+#ゲーム終了処理クラス
 class Finish:
     #終了関数
     def __init__(self):
@@ -220,7 +219,7 @@ def main():
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                return
+                return #main関数return
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if obj.big_btn.collidepoint(event.pos):#ハンマーボタンクリック処理
