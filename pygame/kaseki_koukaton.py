@@ -138,12 +138,13 @@ class Object:
         dis.sfc.blit(self.hanma_img_sfc,(pos),self.hanma_img_rct)
 
     def bilt(self,dis:Display):#全体描画
-        dis.sfc.blit(dis.bgi_sfc, dis.bgi_rct)
-        dis.sfc.blit(self.haikei_img_sfc,self.haikei_img_rct)
-        dis.sfc.blit(self.HPbar_sfc,(20,840,1000,50),self.HPbar_rct)
-        dis.sfc.blit(self.yakitori_img_sfc,self.yakitori_img_rct)
-        dis.sfc.blit(self.doriru_img_sfc,self.doriru_img_rct)
-        dis.sfc.blit(self.hanma_img_sfc,self.hanma_img_rct)
+        lis = [[dis.bgi_sfc, dis.bgi_rct],[self.haikei_img_sfc,self.haikei_img_rct],[self.HPbar_sfc,(20,840,1000,50),self.HPbar_rct],
+        [self.yakitori_img_sfc,self.yakitori_img_rct],[self.doriru_img_sfc,self.doriru_img_rct],[self.hanma_img_sfc,self.hanma_img_rct]]
+        for i in lis:
+            if len(i) == 2:
+                dis.sfc.blit(i[0],i[1])
+            elif len(i) == 3:
+                dis.sfc.blit(i[0],i[1],i[2])
 
 #ゲーム開始時クラス
 class Start:
