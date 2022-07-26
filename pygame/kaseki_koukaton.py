@@ -1,10 +1,6 @@
 import pygame as pg
 import sys
 import random
-<<<<<<< HEAD
-=======
-import datetime
->>>>>>> 8ed127559410d2c17c1b04862bac4356cc1414e8
 
 #基礎ディスプレイ描画クラス
 class Display:
@@ -31,7 +27,7 @@ class Ganban:
         self.kiban_size = pg.Rect(20,20,1000,800)
         self.color_list = [[255,255,255],[220,105,30],[160,82,45],[139,69,19]] #岩盤要カラーリスト
         self.rock = [[random.randint(1,3) for i in range(self.gx_size)] for j in range(self.gy_size)] #岩盤本体の2重配列
-        self.kiban_sfc = pg.Surface((self.gx_size*4,self.gy_size*4))
+        self.kiban_sfc = pg.Surface((self.gx_size*4,self.gy_size*4)) 
         self.kiban_sfc.set_colorkey([255,255,255]) #描画しないカラーキー
         self.kiban_sfc.set_alpha(255) #岩盤の透明度
         self.kiban_rct = self.kiban_sfc.get_rect()
@@ -74,7 +70,7 @@ class Ganban:
 
         elif size == "small":
             self.dig_size = 20
-            self.dig_impct = 3
+            self.dig_impct = 2
 
     def bilt(self,dis:Display):
         dis.sfc.blit(self.kiban_sfc,(20,20,1000,800),self.kiban_rct)
