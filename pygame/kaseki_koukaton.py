@@ -1,13 +1,7 @@
-#from importlib.util import set_loader
-#from turtle import Screen, pos
-from pickle import TRUE
-from re import T
-from sre_constants import SUCCESS
-from winreg import DisableReflectionKey
 import pygame as pg
 import sys
 import random
-from PIL import Image
+import datetime
 
 class Display:
     #基本ディスプレイの描画
@@ -49,7 +43,7 @@ class Ganban:
         self.pos_y = y//4
         self.dig_count += self.dig_impct #岩盤耐久値の減少
         self.dig_list = []
-        self.big_list_x = [[i for i in range(-1*(2+(self.dig_size//4-abs(j-self.dig_size//2))),5+(self.dig_size//4-abs(j-self.dig_size//2)))] for j in range(self.dig_size)] #岩盤掘削用範囲のｘ軸
+        self.big_list_x = [[i for i in range(-1*((self.dig_size//4-abs(j-self.dig_size//2))),(self.dig_size//4-abs(j-self.dig_size//2)))] for j in range(self.dig_size)] #岩盤掘削用範囲のｘ軸
         self.big_list_y = [i for i in range(-1*(self.dig_size//2),(self.dig_size//2)+5)] #岩盤発掘範囲のｙ軸
         for y in range(len(self.big_list_x)):
             for x in range(len(self.big_list_x[y])):
@@ -102,33 +96,38 @@ class Object:
         for i in range(500,500-gbn.dig_count,-1):
             pg.draw.rect(self.HPbar_sfc,(0,0,255),(i*2,0,2,50))#岩盤耐久値減少描写
 
-    def yakitori(self,image,size,pos,gbn:Ganban):
+    def yakitori(self,image,size,pos,gbn:Ganban,dis:Display):
         #コウカトン関数
         self.yakitori_img_sfc = pg.image.load(image)
         self.yakitori_img_sfc = pg.transform.rotozoom(self.yakitori_img_sfc,0,size)
-        tori_x,tori_y = self.yakitori_img_sfc.get_width()//4,self.yakitori_img_sfc.get_width()//4
+        tori_x,tori_y = self.yakitori_img_sfc.get_width()//4,self.yakitori_img_sfc.get_height()//4
         self.yakitori_img_rct = self.yakitori_img_sfc.get_rect()
         self.yakitori_img_rct.center = pos
-        self.yakitori_body_x = [i for i in range(pos[0]//4-(tori_x//2)//4,pos[0]//4+(tori_x//2)//4)]#コウカトンの範囲設定X
-        self.yakitori_body_y = [i for i in range(pos[1]//4-(tori_y//2)//4,pos[1]//4+(tori_y//2)//4)]#コウカトンの範囲設定Y
+        self.yakitori_body_x = [i for i in range((pos[0]-20)//4-(tori_x//3),(pos[0]-20)//4+(tori_x//3))]#コウカトンの範囲設定X
+        self.yakitori_body_y = [i for i in range((pos[1]-20)//4-(tori_y//3),(pos[1]-20)//4+(tori_y//3))]#コウカトンの範囲設定Y
         self.yakitori_body = 0
         self.yakitori_body_lis = []
         for y in self.yakitori_body_y:
             for x in self.yakitori_body_x:
                 self.yakitori_body_lis.append((y,x)) #コウカトンの範囲リストの作成
                 self.yakitori_body += gbn.rock[y][x] #コウカトンの地面への埋まり度の作成
+        #for i in self.yakitori_body_lis:
+        #    print(i)
+        #    pg.draw.rect(gbn.kiban_sfc,(255,0,255),((4*i[1])-tori_x//2,(4*i[0])-tori_y//2,4,4)) #掘削結果の描画
 
+#C0A21048 担当haikei関数
     def haikei(self,image,size):#岩盤背景描画
         self.haikei_img_sfc = pg.image.load(image)
         self.haikei_img_sfc = pg.transform.scale(self.haikei_img_sfc,size)
         self.haikei_img_rct = self.haikei_img_sfc.get_rect()
 
+#C0A21016　担当doriru関数関連
     def doriru(self,image,size,pos):#ドリル描画
         self.doriru_img_sfc = pg.image.load(image)
         self.doriru_img_sfc = pg.transform.rotozoom(self.doriru_img_sfc,0,size)
         self.doriru_img_rct = self.doriru_img_sfc.get_rect()
         self.doriru_img_rct.center = pos
-
+#C0A21132 担当hanmu関数関連
     def hanma(self,image,size,pos):#ハンマー描画
         self.hanma_img_sfc = pg.image.load(image)
         self.hanma_img_sfc = pg.transform.rotozoom(self.hanma_img_sfc,0,size)
@@ -148,7 +147,7 @@ class Object:
         dis.sfc.blit(self.doriru_img_sfc,self.doriru_img_rct)
         dis.sfc.blit(self.hanma_img_sfc,self.hanma_img_rct)
 
-
+#　C0A21048 スタート関数制作
 class Start:
     #スタート画面描画用関数
     def __init__(self,image,dis:Display):
@@ -174,24 +173,33 @@ class Finish:
             if count < 0:
                 count = 0
             succses += count
-        if succses == 0:
+        if succses < 20:
             return True
+        print(succses)
 
-    def game_clear(self,image,size):#クリア画面描画
+    #C0A21052　担当game_clear関数
+    def game_clear(self,image,size,dis:Display):#クリア画面描画
         self.clear_img_sfc = pg.image.load(image)
         self.clear_img_sfc = pg.transform.scale(self.clear_img_sfc,size)
-        self.clear_img_rct = self.over_img_sfc.get_rect()
+        self.clear_img_rct = self.clear_img_sfc.get_rect()
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    sys.exit()
+            dis.sfc.blit(self.clear_img_sfc,self.clear_img_rct)
+            pg.display.update()
+        
 
-    def game_over(self,image,size):#ゲームオーバー画面描画
+    def game_over(self,image,size,dis:Display):#ゲームオーバー画面描画
         self.over_img_sfc = pg.image.load(image)
         self.over_img_sfc = pg.transform.scale(self.over_img_sfc,size)
         self.over_img_rct = self.over_img_sfc.get_rect()
-
-    def succes_bilt(self,dis:Display):
-        dis.sfc.blit(self.clear_img_sfc,self.clear_img_rct)
-
-    def end_bilt(self,dis:Display):
-        dis.sfc.blit(self.over_img_sfc,self.over_img_rct)
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    sys.exit()
+            dis.sfc.blit(self.over_img_sfc,self.over_img_rct)
+            pg.display.update()
 
 def main():
     clock = pg.time.Clock()
@@ -202,12 +210,11 @@ def main():
     scan_flag  = 0 #スキャンフラグ
     clear_flag = False #ゲームクリアフラグ
     ture = "big" #実装途中
-    obj.yakitori("../fig/6.png", 2.0,(random.randint(85,gbn.kiban_sfc.get_width()-50), random.randint(85,gbn.kiban_sfc.get_height()-50)),gbn)
+    obj.yakitori("../fig/6.png", 2.0,(random.randint(85,gbn.kiban_sfc.get_width()-50), random.randint(85,gbn.kiban_sfc.get_height()-50)),gbn,dis)
     obj.haikei("../fig/ganban.png",(1040,840))
     obj.doriru("../fig/doriruu.png", 0.4,(1450,90))
     obj.hanma("../fig/hanmaa.png", 0.3,(1200,95))
-    fin.game_over("../fig/gameover.png",(1600,900))
-    fin.game_clear("../fig/gameclear.png",(1600,900))
+    # C0A21052ゲームスタート画面ゲームクリア画面ゲームオーバー画面作成
     Start("../fig/start.png",dis)#ゲームスタート時処理
     while True: #メインループ
 
@@ -243,10 +250,10 @@ def main():
             obj.hanma_bilt((1370,220,160,160),dis)
 
         if gbn.dig_count >=500:#ゲームオーバー処理
-            fin.end_bilt(dis)
+            fin.game_over("../fig/gameover.png",(1600,900),dis)
         
         if clear_flag == True:#ゲームクリア処理
-            fin.succes_bilt(dis)
+            fin.game_clear("../fig/gameclear.png",(1600,900),dis)
 
         pg.display.update() #ディスプレイアップデート処理
         if scan_flag == 1: #スキャン処理
