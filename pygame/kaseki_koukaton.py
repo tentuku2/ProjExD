@@ -7,7 +7,6 @@ from winreg import DisableReflectionKey
 import pygame as pg
 import sys
 import random
-from PIL import Image
 
 class Display:
     def __init__(self, title, wh, col):
